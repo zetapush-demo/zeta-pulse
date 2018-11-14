@@ -1,8 +1,0 @@
-{
-  "platformUrl": "http://hq.zpush.io:9080/zbo/pub/business",
-  "appName": "test_orga2-myproduct-dev2",
-  "npmRegistry": "https://registry.npmjs.org",
-  "TS_NODE_SKIP_IGNORE": "false",
-  "developerLogin": "test2@yopmail.com",
-  "developerSecretToken": "Y2U3ZDAxMDFmYmUzOGM4OTBjOTg0YjI3MmQ0ZTA1YmRhYWM1NzAxNA=="
-}
