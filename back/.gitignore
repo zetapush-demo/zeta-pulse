@@ -2,13 +2,6 @@
 
 # compiled output
 /dist
-/deploy
-/tmp
-
-# submodules
-/last-build
-/mock-api
-/swagger
 
 # dependencies
 /node_modules
@@ -32,13 +25,7 @@ yarn-error.log
 
 # misc
 /.sass-cache
-/connect.lock
-/coverage/*
-/libpeerconnection.log
 npm-debug.log
-testem.log
-/typings
-/.vagrant
 package-lock.json
 .prettierc
 
