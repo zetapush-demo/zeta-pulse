@@ -1,0 +1,13 @@
+$size: 50px;
+
+:host {
+  position: absolute;
+  display: block;
+  width: $size;
+  height: $size;
+  margin-left: -$size;
+  margin-top: -$size;
+  background-color: red;
+  border-radius: 50%;
+  cursor: none;
+}
