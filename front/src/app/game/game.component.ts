@@ -18,6 +18,7 @@ export class GameComponent implements OnDestroy {
   playerId: string // local player id
   ownerId: string // game owner id
   isOwner: boolean = false
+  messages: any[]
 
   playerColor: string = `hsl(${Math.round(360 * Math.random())}, 50%, 40%)` // random color
   users: string[] = [] // game's users list
@@ -48,6 +49,7 @@ export class GameComponent implements OnDestroy {
     this.playerId = response.callee
     this.ownerId = response.owner
     this.users = response.users
+    this.messages = response.messages
 
     if (this.playerId == this.ownerId) {
       this.isOwner = true

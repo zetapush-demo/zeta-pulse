@@ -1,4 +1,4 @@
-import { Messaging, Groups, GroupUsers } from '@zetapush/platform-legacy'
+import { Messaging, Groups, GroupUsers, Stack } from '@zetapush/platform-legacy'
 import { Injectable, Context } from '@zetapush/core'
 
 export interface IRoom {
@@ -8,7 +8,7 @@ export interface IRoom {
 @Injectable()
 export default class Api {
   private requestContext: Context
-  constructor(private messaging: Messaging, private groups: Groups) {
+  constructor(private messaging: Messaging, private groups: Groups, private stack: Stack) {
 
   }
 
@@ -32,6 +32,12 @@ export default class Api {
       group: roomId,
       groupName: this.requestContext.owner
     })
+		// await this.stack.push({
+		// 	stack: roomId,
+		// 	data: {
+    //     text: `Welcome on chat #${roomId}`
+    //   }
+		// });
     return roomId
   }
 
@@ -46,14 +52,37 @@ export default class Api {
       group: roomId,
       user: this.requestContext.owner
     })
+    try {
+      const { result } = await this.stack.list({
+        stack: roomId
+      });
+    }
+    catch(exception) {
+      console.warn('Worker::joinRoom--error', exception)
+    }
     const group: GroupUsers = await this.groups.groupUsers({ group: roomId })
     const users: string[] = group.users || []
     this.onNewPlayer(roomId)
 
+    let messages: any[]
+
+		// if (!result || !result.content) {
+    //   messages = []
+    // }
+    // else {
+    //   messages = result.content
+    //   // messages = result.content.reverse().map(x => {
+    //   //   return {
+    //   //     data: x.data,
+    //   //     ts: x.ts
+    //   //   }
+    //   // })
+    // }
     return {
       users,
       owner: group.groupName,
-      callee: this.requestContext.owner
+      callee: this.requestContext.owner,
+			messages: []
     }
   }
   async onNewPlayer(roomId: string) {
@@ -62,6 +91,16 @@ export default class Api {
   async sendPosition(request: any) {
     const { roomId, data } = request
     this.sendMessage(`position${roomId}`, roomId, data)
+  }
+  async sendChatMessage(request: any) {
+    const { roomId, text } = request
+    this.sendMessage(`chat${roomId}`, roomId, { text, ts: Date.now() })
+    await this.stack.push({
+      stack: roomId,
+      data: {
+        text
+      }
+    })
   }
 
   async sendMessage(channel: string, roomId: string, data: any = {}) {
