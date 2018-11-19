@@ -1,7 +1,7 @@
 import { Component, OnInit, ElementRef, OnDestroy, ViewChildren, QueryList } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { fromEvent, Subscription } from 'rxjs'
-import { debounceTime } from 'rxjs/operators'
+import { throttleTime } from 'rxjs/operators'
 
 import { ApiService, IMessage } from 'src/services/api/api.service'
 import { IPlayer, PlayerComponent } from 'src/shared/components/player/player.component'
@@ -11,7 +11,7 @@ import { IPlayer, PlayerComponent } from 'src/shared/components/player/player.co
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.scss']
 })
-export class GameComponent implements OnInit, OnDestroy {
+export class GameComponent implements OnDestroy {
   $move: Subscription // Observable for click event
 
   gameId: string // Group Id
@@ -20,20 +20,14 @@ export class GameComponent implements OnInit, OnDestroy {
   isOwner: boolean = false
 
   playerColor: string = `hsl(${Math.round(360 * Math.random())}, 50%, 40%)` // random color
-  users: string[] // game's users list
-  activeUsers: PlayerComponent[] = [] // users list filtered on activity
-  @ViewChildren(PlayerComponent) players: QueryList<PlayerComponent> //list of player's DOM element
+  users: string[] = [] // game's users list
 
   constructor(
     private element: ElementRef, // <app-game> component instance
     private api: ApiService, // api service connected to worker
     private route: ActivatedRoute // angular route listener
-  ) {}
-
-  ngOnInit() {
-    // Listen to click event observable to send message
-    this.api.move.subscribe(message => this.onMove(message))
-
+  ) {
+    this.api.onNewPlayer.subscribe((users) => this.onNewPlayer(users))
     this.route.params.subscribe(params => this.loadGame(params.gameId))
   }
 
@@ -63,29 +57,21 @@ export class GameComponent implements OnInit, OnDestroy {
       this.$move.unsubscribe()
     }
     this.$move = fromEvent(this.element.nativeElement, 'click')
-      .pipe(debounceTime(250))
-      .subscribe(event => this.move(event))
+      .pipe(throttleTime(250))
+      .subscribe(event => this.getPosition(event))
   }
 
-  async move(event: any) {
+  async getPosition(event: any) {
     const data: IPlayer = {
       id: this.playerId,
       color: this.playerColor,
       x: event.clientX,
       y: event.clientY
     }
-    const message = await this.api.sendMove(this.gameId, data)
+    await this.api.setPosition(this.gameId, data)
   }
-
-  onMove(message: IMessage) {
-    const player: IPlayer = message.data
-    this.users = message.target
-  }
-
-  getActiveUsers() {
-    if (this.players) {
-      this.activeUsers = this.players.filter(player => player.active)
-    }
+  onNewPlayer(users) {
+    this.users = users
   }
 
   ngOnDestroy() {

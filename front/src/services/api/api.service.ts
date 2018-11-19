@@ -24,8 +24,8 @@ export interface IMessage {
 export class ApiService {
   client: WeakClient
   worker: ProxyService
-  move: Subject<IMessage> = new Subject()
-  target: Subject<any> = new Subject()
+  onGetPosition: Subject<IMessage> = new Subject()
+  onNewPlayer: Subject<string[]> = new Subject()
 
   constructor() {
     this.client = new WeakClient({
@@ -50,16 +50,20 @@ export class ApiService {
     await this.client.createService({
       Type: Messaging,
       listener: {
-        [roomId]: (response: any) => {
+        [`new${roomId}`]: (response: any) => {
           const message: IMessage = response.data
-          return this.move.next(message)
+          this.onNewPlayer.next(message.target)
+        },
+        [`position${roomId}`]: (response: any) => {
+          const message: IMessage = response.data
+          return this.onGetPosition.next(message)
         }
       }
     })
     return { response }
   }
 
-  async sendMove(roomId: string, data: IPlayer) {
-    const message = await this.worker.sendMessage({ roomId, data })
+  async setPosition(roomId: string, data: IPlayer) {
+    const message = await this.worker.sendPosition({ roomId, data })
   }
 }

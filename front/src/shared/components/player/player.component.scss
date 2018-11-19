@@ -17,11 +17,6 @@ $size: 40px;
   box-shadow: 0 0 8px 0 currentColor, inset 0 0 2px 4px currentColor;
   transition: opacity 1s linear, transform 0.5s ease-in-out;
   opacity: 1;
-  &.off {
-    opacity: 0;
-    transform: scale(0);
-    animation-play-state: paused;
-  }
   &:before {
     content: '';
     position: absolute;

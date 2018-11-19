@@ -8,7 +8,9 @@ export interface IRoom {
 @Injectable()
 export default class Api {
   private requestContext: Context
-  constructor(private messaging: Messaging, private groups: Groups) {}
+  constructor(private messaging: Messaging, private groups: Groups) {
+
+  }
 
   /*
    * Random 4 alpha-numeric id
@@ -20,9 +22,7 @@ export default class Api {
   async createRoom(room: Partial<IRoom> = {}): Promise<string> {
     const roomId = this.generateId()
 
-    const { exists } = await this.groups.exists({
-      group: roomId
-    })
+    const { exists } = await this.groups.exists({ group: roomId })
 
     if (exists) {
       return this.createRoom(room)
@@ -36,9 +36,7 @@ export default class Api {
   }
 
   async joinRoom(roomId: string) {
-    const { exists } = await this.groups.exists({
-      group: roomId
-    })
+    const { exists } = await this.groups.exists({ group: roomId })
 
     if (!exists) {
       return null
@@ -48,10 +46,9 @@ export default class Api {
       group: roomId,
       user: this.requestContext.owner
     })
-    const group: GroupUsers = await this.groups.groupUsers({
-      group: roomId
-    })
+    const group: GroupUsers = await this.groups.groupUsers({ group: roomId })
     const users: string[] = group.users || []
+    this.onNewPlayer(roomId)
 
     return {
       users,
@@ -59,17 +56,21 @@ export default class Api {
       callee: this.requestContext.owner
     }
   }
-
-  async sendMessage(request: any) {
+  async onNewPlayer(roomId: string) {
+    this.sendMessage(`new${roomId}`, roomId)
+  }
+  async sendPosition(request: any) {
     const { roomId, data } = request
-    const group: GroupUsers = await this.groups.groupUsers({
-      group: roomId
-    })
-    const users: string[] = group.users || []
+    this.sendMessage(`position${roomId}`, roomId, data)
+  }
+
+  async sendMessage(channel: string, roomId: string, data: any = {}) {
+    const group: GroupUsers = await this.groups.groupUsers({ group: roomId })
+    const target: string[] = group.users || []
 
     this.messaging.send({
-      channel: roomId,
-      target: users,
+      channel,
+      target,
       data
     })
   }
