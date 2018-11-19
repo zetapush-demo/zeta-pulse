@@ -19,11 +19,11 @@ export class GameComponent implements OnInit, OnDestroy {
   gameId: string // Group Id
   playerId: string // player id
   playerName: string // player name
+  playerColor: string = `hsl(${Math.round(360 * Math.random())}, 50%, 40%)` // random player color
   ownerId: string // game owner id
   isOwner: boolean = false
   messages: any[]
 
-  playerColor: string = `hsl(${Math.round(360 * Math.random())}, 50%, 40%)` // random color
   users: string[] = [] // game's users list
   @ViewChild('game') game // html game container
 

@@ -93,11 +93,12 @@ export default class Api {
     this.sendMessage(`position${roomId}`, roomId, data)
   }
   async sendChatMessage(request: any) {
-    const { roomId, text } = request
-    this.sendMessage(`chat${roomId}`, roomId, { text, ts: Date.now() })
+    const { roomId, message: { text, name } } = request
+    this.sendMessage(`chat${roomId}`, roomId, { name, text, ts: Date.now() })
     await this.stack.push({
       stack: roomId,
       data: {
+        name,
         text
       }
     })

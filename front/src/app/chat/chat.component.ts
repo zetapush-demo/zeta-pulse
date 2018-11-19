@@ -2,8 +2,9 @@ import { Component, OnInit, Input } from '@angular/core'
 import { ApiService } from '../../services/api/api.service';
 
 export interface IChatMessage {
-  text: string,
-  ts: number
+  name: string
+  text: string
+  ts?: number
 }
 
 @Component({
@@ -14,6 +15,7 @@ export interface IChatMessage {
 export class ChatComponent implements OnInit {
 
   @Input() roomId: string
+  @Input() name: string
   @Input() messages: IChatMessage[]
 
   constructor(
@@ -25,7 +27,11 @@ export class ChatComponent implements OnInit {
   ngOnInit() {
   }
 
-  sendMessage(message) {
+  sendMessage(text) {
+    const message = {
+      text, 
+      name: this.name
+    }
     this.api.sendChatMessage(this.roomId, message)
   }
   onMessage(message: IChatMessage) {
