@@ -3,7 +3,7 @@
     <p *ngFor="let message of messages">{{message.text}} <span>{{message.ts | date:'HH:mm:ss' }}</span></p>
   </mat-card-content>
   <mat-card-footer>
-    <form (submit)="sendMessage(message.value)">
+    <form novalidate (submit)="sendMessage(message.value)">
       <mat-form-field>
         <input matInput #message placeholder="Hello !">
       </mat-form-field>

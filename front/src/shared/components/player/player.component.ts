@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 export interface IPlayer {
   id?: string
   color?: string
+  name?: string
   x: number
   y: number
 }
@@ -16,6 +17,7 @@ export interface IPlayer {
 })
 export class PlayerComponent implements OnInit {
   @Input() id: string
+  player: IPlayer
 
   constructor(private element: ElementRef<any>, private api: ApiService, private renderer: Renderer2) {
     this.api.onGetPosition
@@ -26,9 +28,10 @@ export class PlayerComponent implements OnInit {
   ngOnInit() {}
 
   setPosition(player: IPlayer) {
-    const { id, x, y } = player
+    this.player = player
+    const { id, x, y, name, color } = player
     // this.renderer.setStyle(this.element.nativeElement, 'border-color', player.color)
-    this.renderer.setStyle(this.element.nativeElement, 'color', player.color)
+    this.renderer.setStyle(this.element.nativeElement, 'color', color)
     this.renderer.setStyle(this.element.nativeElement, 'transform', `translate3d(${x}px, ${y}px, 0)`)
   }
 }

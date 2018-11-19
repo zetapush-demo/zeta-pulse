@@ -5,7 +5,7 @@ import { AppComponent } from './app.component'
 import { GameComponent } from './game/game.component'
 import { JoinComponent } from './join/join.component'
 import { ApiService } from 'src/services/api/api.service'
-import { ChatComponent } from './chat/chat.component';
+import { ChatComponent } from './chat/chat.component'
 
 export const COMPONENTS = [AppComponent, GameComponent, JoinComponent, ChatComponent]
 

@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core'
 import { ApiService } from '../../services/api/api.service';
 
 export interface IChatMessage {
-  text: any,
+  text: string,
   ts: number
 }
 
@@ -26,7 +26,7 @@ export class ChatComponent implements OnInit {
   }
 
   sendMessage(message) {
-    this.api.sendMessage(this.roomId, message)
+    this.api.sendChatMessage(this.roomId, message)
   }
   onMessage(message: IChatMessage) {
     console.info('ChatComponent::onMessage', { message, messages: this.messages })

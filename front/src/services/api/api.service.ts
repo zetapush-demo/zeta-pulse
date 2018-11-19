@@ -75,7 +75,7 @@ export class ApiService {
   async setPosition(roomId: string, data: IPlayer) {
     const message = await this.worker.sendPosition({ roomId, data })
   }
-  async sendMessage(roomId: string, text: string) {
+  async sendChatMessage(roomId: string, text: string) {
     const message = await this.worker.sendChatMessage({ roomId, text })
   }
 }
