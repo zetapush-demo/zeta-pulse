@@ -41,7 +41,7 @@ export default class Api {
     return roomId
   }
 
-  async joinRoom(roomId: string) {
+  async joinRoom({ roomId, player }: { roomId: string, player: any }) {
     const { exists } = await this.groups.exists({ group: roomId })
 
     if (!exists) {
@@ -62,7 +62,7 @@ export default class Api {
     }
     const group: GroupUsers = await this.groups.groupUsers({ group: roomId })
     const users: string[] = group.users || []
-    this.onNewPlayer(roomId)
+    this.onNewPlayer(roomId, player)
 
     let messages: any[]
 
@@ -85,8 +85,8 @@ export default class Api {
 			messages: []
     }
   }
-  async onNewPlayer(roomId: string) {
-    this.sendMessage(`new${roomId}`, roomId)
+  async onNewPlayer(roomId: string, player: any) {
+    this.sendMessage(`new${roomId}`, roomId, player)
   }
   async sendPosition(request: any) {
     const { roomId, data } = request

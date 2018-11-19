@@ -26,7 +26,7 @@ export class ApiService {
   client: WeakClient
   worker: ProxyService
   onGetPosition: Subject<IMessage> = new Subject()
-  onNewPlayer: Subject<string[]> = new Subject()
+  onNewPlayer: Subject<IMessage> = new Subject()
   onChatMessage: Subject<IChatMessage> = new Subject()
 
   constructor() {
@@ -46,8 +46,8 @@ export class ApiService {
     return roomId
   }
 
-  async joinRoom(roomId: string) {
-    const response = await this.worker.joinRoom(roomId)
+  async joinRoom(roomId: string, player: Partial<IPlayer>) {
+    const response = await this.worker.joinRoom({ roomId, player })
     console.info('Api::joinRoom', { response })
 
     await this.client.createService({
@@ -55,7 +55,7 @@ export class ApiService {
       listener: {
         [`new${roomId}`]: (response: any) => {
           const data: IMessage = response.data
-          this.onNewPlayer.next(data.target)
+          this.onNewPlayer.next(data)
         },
         [`position${roomId}`]: (response: any) => {
           const data: IMessage = response.data

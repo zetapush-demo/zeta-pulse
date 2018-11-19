@@ -25,7 +25,8 @@ export class PlayerComponent implements OnInit {
       .subscribe((message: IMessage) => this.setPosition(message.data))
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
   setPosition(player: IPlayer) {
     this.player = player

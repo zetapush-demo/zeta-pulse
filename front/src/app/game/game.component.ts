@@ -17,9 +17,9 @@ export class GameComponent implements OnInit, OnDestroy {
   $move: Subscription // Observable for click event
 
   gameId: string // Group Id
-  playerId: string // player id
-  playerName: string // player name
-  playerColor: string = `hsl(${Math.round(360 * Math.random())}, 50%, 40%)` // random player color
+  player: Partial<IPlayer> = {
+    color: `hsl(${Math.round(360 * Math.random())}, 50%, 40%)` // random player color
+  }
   ownerId: string // game owner id
   isOwner: boolean = false
   messages: any[]
@@ -35,28 +35,27 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.api.onNewPlayer.subscribe((users) => this.onNewPlayer(users))
+    this.api.onNewPlayer.subscribe((message) => this.onNewPlayer(message))
     this.route.params.subscribe(params => this.loadGame(params.gameId))
   }
 
   async loadGame(gameId) {
     this.gameId = gameId
     await this.joinGame()
-    await this.askName()
+    this.askName()
   }
-  async askName() {
-    return new Promise((resolve, reject) => {
-      const dialogRef = this.dialog.open(DialogGameComponent, { disableClose: true })
+  askName() {
+    const dialogRef = this.dialog.open(DialogGameComponent, { disableClose: true })
 
-      dialogRef.afterClosed().subscribe(result => {
-        this.playerName = result
-        resolve()
-      })
+    dialogRef.afterClosed().subscribe(name => {
+      this.player.name = name
     })
   }
   async joinGame() {
     try {
-      const { response } = await this.api.joinRoom(this.gameId)
+      this.player.x = Math.round(Math.random() * window.innerWidth)
+      this.player.y = Math.round(Math.random() * window.innerHeight)
+      const { response } = await this.api.joinRoom(this.gameId, this.player)
       if (response) {
         this.onLoadGame(response)
       } else {
@@ -67,12 +66,12 @@ export class GameComponent implements OnInit, OnDestroy {
     }
   }
   onLoadGame(response) {
-    this.playerId = response.callee
+    this.player.id = response.callee
     this.ownerId = response.owner
     this.users = response.users
     this.messages = response.messages
 
-    if (this.playerId == this.ownerId) {
+    if (this.player.id == this.ownerId) {
       this.isOwner = true
     }
 
@@ -85,17 +84,18 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   async getPosition(event: any) {
+    const { id, name, color } = this.player
     const data: IPlayer = {
-      id: this.playerId,
-      color: this.playerColor,
-      name: this.playerName,
+      id,
+      color,
+      name,
       x: event.clientX,
       y: event.clientY
     }
     await this.api.setPosition(this.gameId, data)
   }
-  onNewPlayer(users) {
-    this.users = users
+  onNewPlayer(message: IMessage) {
+    this.users = message.target
   }
 
   ngOnDestroy() {
