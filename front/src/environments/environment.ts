@@ -3,8 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
-};
+  production: false,
+  platformUrl: 'http://hq.zpush.io:9080/zbo/pub/business',
+  appName: '488gqhgex'
+}
 
 /*
  * In development mode, for easier debugging, you can ignore zone related error

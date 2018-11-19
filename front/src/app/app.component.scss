@@ -1,0 +1,28 @@
+@import '../variables.scss';
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: $light-grey;
+}
+
+header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 50px;
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.26);
+}
+
+main {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  // top: 50px;
+  // height: calc(100% - 50px);
+}

@@ -1,8 +1,9 @@
-import { Component, OnInit, Input, ElementRef, Renderer2 } from '@angular/core'
-import { GameService } from 'src/services/game.service'
+import { Component, OnInit, Input, ElementRef, Renderer2, Output, EventEmitter } from '@angular/core'
+import { ApiService } from 'src/services/api/api.service'
 
 export interface IPlayer {
-  id: string
+  id?: string
+  color?: string
   x: number
   y: number
 }
@@ -14,13 +15,15 @@ export interface IPlayer {
 })
 export class PlayerComponent implements OnInit {
   @Input() id: string
+  @Output() onHide: EventEmitter<any> = new EventEmitter()
+  @Output() onShow: EventEmitter<any> = new EventEmitter()
 
-  constructor(
-    private element: ElementRef<any>,
-    private game: GameService,
-    private renderer: Renderer2
-  ) {
-    this.game.move.subscribe(this.onMove.bind(this))
+  timeout: any
+  active: boolean = false
+  activeTime: number = 20000
+
+  constructor(private element: ElementRef<any>, private api: ApiService, private renderer: Renderer2) {
+    this.api.move.subscribe(this.onMove.bind(this))
   }
 
   ngOnInit() {}
@@ -28,12 +31,30 @@ export class PlayerComponent implements OnInit {
   onMove(player: IPlayer) {
     const { id, x, y } = player
     if (this.id == id) {
-      console.warn(player, this.element.nativeElement)
-      this.renderer.setStyle(
-        this.element.nativeElement,
-        'transform',
-        `translate3d(${x}px, ${y}px, 0)`
-      )
+      this.showPlayer()
+
+      // this.renderer.setStyle(this.element.nativeElement, 'border-color', player.color)
+      this.renderer.setStyle(this.element.nativeElement, 'color', player.color)
+      this.renderer.setStyle(this.element.nativeElement, 'transform', `translate3d(${x}px, ${y}px, 0)`)
     }
+  }
+
+  showPlayer() {
+    clearTimeout(this.timeout)
+    this.active = true
+    this.element.nativeElement.classList.remove('off')
+    this.onShow.next()
+
+    this.timeout = setTimeout(() => {
+      this.hidePlayer()
+    }, this.activeTime)
+  }
+  hidePlayer() {
+    this.element.nativeElement.classList.add('off')
+    // wait animation end to refresh active players
+    setTimeout(() => {
+      this.active = false
+      this.onHide.next()
+    }, 1000)
   }
 }

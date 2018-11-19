@@ -1,30 +1,37 @@
 import { BrowserModule } from '@angular/platform-browser'
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
-
-import { AppComponent } from './app.component'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { GameComponent } from './game/game.component'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
-import { ENTRY_COMPONENTS } from '../shared/components'
-
-const routes: Routes = [
-  {
-    path: '',
-    component: AppComponent,
-    children: [
-      { path: '', redirectTo: 'game', pathMatch: 'full' },
-      { path: 'game', component: GameComponent }
-    ]
-  }
+const ANGULAR = [
+  BrowserModule,
+  BrowserAnimationsModule,
+  FormsModule,
+  ReactiveFormsModule
 ]
 
+import { MatCardModule } from '@angular/material/card'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatInputModule } from '@angular/material/input'
+import { MatButtonModule } from '@angular/material/button'
+const MATERIAL = [
+  MatCardModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatButtonModule
+]
+
+import { AppComponent } from './app.component'
+import { ENTRY_COMPONENTS } from '../shared/components'
+import { APP_ROUTES, COMPONENTS } from './app.routing'
+
 @NgModule({
-  declarations: [AppComponent, GameComponent, ...ENTRY_COMPONENTS],
+  declarations: [...COMPONENTS, ...ENTRY_COMPONENTS],
   imports: [
-    RouterModule.forRoot(routes, { useHash: true }),
-    BrowserModule,
-    BrowserAnimationsModule
+    RouterModule.forRoot(APP_ROUTES, { useHash: true }),
+    ...ANGULAR,
+    ...MATERIAL
   ],
   providers: [],
   bootstrap: [AppComponent],

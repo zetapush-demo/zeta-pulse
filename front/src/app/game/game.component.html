@@ -1,1 +1,6 @@
-<app-player [id]="'toto'"></app-player>
+<h2>Click to move !</h2>  
+<p>Party Id: {{gameId}}</p>
+<p>Players: {{activeUsers?.length}}</p>
+
+
+<app-player *ngFor="let id of users" [id]="id" class="off" (onHide)="getActiveUsers()" (onShow)="getActiveUsers()"></app-player>
