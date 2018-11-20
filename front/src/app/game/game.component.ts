@@ -17,16 +17,15 @@ export class GameComponent implements OnInit, OnDestroy {
   $move: Subscription // Observable for click event
 
   roomId: string // Group Id
+  // player object
   player: Partial<IPlayer> = {
     color: `hsl(${Math.round(360 * Math.random())}, 50%, 40%)` // random player color
   }
   ownerId: string // game owner id
-  isOwner: boolean = false
   messages: any[]
 
   users: string[] = [] // game's users list
   @ViewChild('game') game // html game container
-  @ViewChildren(PlayerComponent) players: QueryList<PlayerComponent>
 
   constructor(
     private api: ApiService, // api service connected to worker
@@ -35,30 +34,31 @@ export class GameComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    // Listen to 'new player' event from worker
     this.api.onNewPlayer.subscribe(message => this.onNewPlayer(message))
+    // Observe route param to load game base on roomId in url
     this.route.params.subscribe(params => this.loadGame(params.roomId))
   }
 
+  /**
+   * Init game state
+   * @param roomId
+   */
   async loadGame(roomId) {
     this.roomId = roomId
     await this.joinGame()
-    this.askName()
+    this.initPlayer()
   }
-  askName() {
-    const dialogRef = this.dialog.open(DialogGameComponent, { disableClose: true })
 
-    dialogRef.afterClosed().subscribe(name => {
-      this.player.name = name
-      this.player.x = Math.round(Math.random() * window.innerWidth)
-      this.player.y = Math.round(Math.random() * window.innerHeight)
-      this.api.sendNewPlayer(this.roomId, this.player)
-    })
-  }
+  /**
+   * Call api to add current user to roomId
+   */
   async joinGame() {
     try {
       const { response } = await this.api.joinRoom(this.roomId)
       if (response) {
-        this.onLoadGame(response)
+        this.initGame(response)
+        console.info('Game::loadGame--success')
       } else {
         console.warn('Game::loadGame--not-found')
       }
@@ -66,16 +66,41 @@ export class GameComponent implements OnInit, OnDestroy {
       console.error('Game::loadGame--error', { exception })
     }
   }
-  onLoadGame(response) {
+
+  /**
+   * Init player state and send 'new-player' event to other users
+   */
+  initPlayer() {
+    // Check for local cached player state
+    const player = JSON.parse(localStorage.getItem(this.roomId))
+    if (player) {
+      this.player = player
+      this.api.sendNewPlayer(this.roomId, this.player)
+      return
+    }
+    // Else ask for name and init player random position / cache
+    const dialogRef = this.dialog.open(DialogGameComponent, { disableClose: true })
+    dialogRef.afterClosed().subscribe(name => {
+      this.player.name = name
+      this.player.x = Math.round(Math.random() * (window.innerWidth * 0.5))
+      this.player.y = Math.round(Math.random() * (window.innerHeight * 0.5))
+      localStorage.setItem(this.roomId, JSON.stringify(this.player))
+      this.api.sendNewPlayer(this.roomId, this.player)
+    })
+  }
+
+  /**
+   * Get infos from room and init event handler
+   */
+  initGame(response) {
+    // set owner id, player id, users, messages from chat
+    this.player.roomId = this.roomId
     this.player.id = response.callee
     this.ownerId = response.owner
     this.users = response.users
     this.messages = response.messages
 
-    if (this.player.id == this.ownerId) {
-      this.isOwner = true
-    }
-
+    // Handle click event on <#game> element
     if (this.$move) {
       this.$move.unsubscribe()
     }
@@ -84,6 +109,9 @@ export class GameComponent implements OnInit, OnDestroy {
       .subscribe(event => this.getPosition(event))
   }
 
+  /**
+   * Send new position on click event
+   */
   async getPosition(event: any) {
     const { id, name, color } = this.player
     const data: IPlayer = {
@@ -93,12 +121,19 @@ export class GameComponent implements OnInit, OnDestroy {
       x: event.clientX,
       y: event.clientY
     }
+    localStorage.setItem(this.roomId, JSON.stringify(data))
     await this.api.sendPosition(this.roomId, data)
   }
+
+  /**
+   * Update users list on 'new-player' event
+   * @param message
+   */
   onNewPlayer(message: IMessage) {
     this.users = message.target
   }
 
+  // Destroy click handler
   ngOnDestroy() {
     this.$move.unsubscribe()
   }

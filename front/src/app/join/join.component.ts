@@ -14,11 +14,17 @@ export class JoinComponent implements OnInit {
 
   ngOnInit() {}
 
-  async join() {
+  /**
+   * Change route to /game/:id
+   */
+  join() {
     console.info('JoinComponent::join', { gameId: this.gameId })
     this.router.navigate(['game', this.gameId])
   }
 
+  /**
+   * Create new room and change route to /game/:id
+   */
   async create() {
     console.info('JoinComponent::create--start')
     try {

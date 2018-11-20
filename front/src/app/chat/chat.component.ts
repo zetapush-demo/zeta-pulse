@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core'
-import { ApiService } from '../../services/api/api.service';
+import { ApiService } from '../../services/api/api.service'
 
 export interface IChatMessage {
   name: string
@@ -13,27 +13,34 @@ export interface IChatMessage {
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent implements OnInit {
-
   @Input() roomId: string
   @Input() name: string
   @Input() messages: IChatMessage[]
 
   constructor(
-    private api: ApiService, // api service connected to worker
+    private api: ApiService // api service connected to worker
   ) {
-    this.api.onChatMessage.subscribe((message) => this.onMessage(message))
+    // Listen to 'new-message' event from api
+    this.api.onChatMessage.subscribe(message => this.onMessage(message))
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
+  /**
+   * send 'new-message' event with message data
+   * @param text
+   */
   sendMessage(text) {
     const message = {
-      text, 
+      text,
       name: this.name
     }
     this.api.sendChatMessage(this.roomId, message)
   }
+  /**
+   * push new message to list
+   * @param message
+   */
   onMessage(message: IChatMessage) {
     console.info('ChatComponent::onMessage', { message, messages: this.messages })
     this.messages.push(message)
