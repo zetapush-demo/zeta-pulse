@@ -1,10 +1,12 @@
 <div #game class="game">
-  <h2>Click to move !</h2>  
-  <p>Party Id: {{gameId}}</p>
-  <p>Players: {{users?.length}}</p>
+  <div class="infos">
+    <h2>Click to move !</h2>  
+    <p>Room Id: {{roomId}}</p>
+    <p>Players: {{users?.length}}</p>
+  </div>
   
   
   <app-player *ngFor="let id of users" [id]="id"></app-player>
 </div>
 
-<app-chat [roomId]="gameId" [messages]="messages" [name]="playerName"></app-chat>
+<app-chat [roomId]="roomId" [messages]="messages" [name]="player.name"></app-chat>

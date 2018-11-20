@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core'
-import { Subject } from 'rxjs'
+import { Subject, ReplaySubject } from 'rxjs'
 
 import { WeakClient, ProxyService } from '@zetapush/client'
 import { Messaging } from '@zetapush/platform-legacy'
 import { environment } from 'src/environments/environment'
 import { IPlayer } from 'src/shared/components/player/player.component'
 import { ITarget } from 'src/shared/components/target/target.component'
-import { IChatMessage } from '../../app/chat/chat.component';
+import { IChatMessage } from '../../app/chat/chat.component'
 
 export interface IRoom {
   name?: string
@@ -26,7 +26,7 @@ export class ApiService {
   client: WeakClient
   worker: ProxyService
   onGetPosition: Subject<IMessage> = new Subject()
-  onNewPlayer: Subject<IMessage> = new Subject()
+  onNewPlayer: ReplaySubject<IMessage> = new ReplaySubject(1)
   onChatMessage: Subject<IChatMessage> = new Subject()
 
   constructor() {
@@ -46,34 +46,39 @@ export class ApiService {
     return roomId
   }
 
-  async joinRoom(roomId: string, player: Partial<IPlayer>) {
-    const response = await this.worker.joinRoom({ roomId, player })
+  async joinRoom(roomId: string) {
+    const response = await this.worker.joinRoom(roomId)
     console.info('Api::joinRoom', { response })
 
     await this.client.createService({
       Type: Messaging,
       listener: {
         [`new${roomId}`]: (response: any) => {
+          console.info('Api::message--new', response)
           const data: IMessage = response.data
           this.onNewPlayer.next(data)
         },
         [`position${roomId}`]: (response: any) => {
+          console.info('Api::message--position', response)
           const data: IMessage = response.data
           return this.onGetPosition.next(data)
         },
         [`chat${roomId}`]: (response: any) => {
+          console.info('Api::message--chat', response)
           const data: IMessage = response.data
           const message: IChatMessage = data.data
           this.onChatMessage.next(message)
-          console.warn('chat', message)
         }
       }
     })
     return { response }
   }
 
-  async setPosition(roomId: string, data: IPlayer) {
-    const response = await this.worker.sendPosition({ roomId, data })
+  async sendPosition(roomId: string, player: IPlayer) {
+    const response = await this.worker.sendPosition({ roomId, player })
+  }
+  async sendNewPlayer(roomId: string, player: Partial<IPlayer>) {
+    const response = await this.worker.sendNewPlayer({ roomId, player })
   }
   async sendChatMessage(roomId: string, message: IChatMessage) {
     const response = await this.worker.sendChatMessage({ roomId, message })

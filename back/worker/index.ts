@@ -8,9 +8,11 @@ export interface IRoom {
 @Injectable()
 export default class Api {
   private requestContext: Context
-  constructor(private messaging: Messaging, private groups: Groups, private stack: Stack) {
-
-  }
+  constructor(
+    private messaging: Messaging,
+    private groups: Groups,
+    private stack: Stack
+  ) {}
 
   /*
    * Random 4 alpha-numeric id
@@ -32,16 +34,17 @@ export default class Api {
       group: roomId,
       groupName: this.requestContext.owner
     })
-		// await this.stack.push({
-		// 	stack: roomId,
-		// 	data: {
+    // await this.stack.push({
+    // 	stack: roomId,
+    // 	data: {
     //     text: `Welcome on chat #${roomId}`
     //   }
-		// });
+    // });
     return roomId
   }
 
-  async joinRoom({ roomId, player }: { roomId: string, player: any }) {
+  async joinRoom(roomId: string) {
+    console.log('Api::joinRoom', roomId)
     const { exists } = await this.groups.exists({ group: roomId })
 
     if (!exists) {
@@ -55,21 +58,16 @@ export default class Api {
     try {
       const { result } = await this.stack.list({
         stack: roomId
-      });
-    }
-    catch(exception) {
+      })
+    } catch (exception) {
       console.warn('Worker::joinRoom--error', exception)
     }
     const group: GroupUsers = await this.groups.groupUsers({ group: roomId })
     const users: string[] = group.users || []
-    this.onNewPlayer(roomId, player)
 
-    let messages: any[]
+    let messages: any[] = []
 
-		// if (!result || !result.content) {
-    //   messages = []
-    // }
-    // else {
+    // if (result && result.content) {
     //   messages = result.content
     //   // messages = result.content.reverse().map(x => {
     //   //   return {
@@ -82,25 +80,30 @@ export default class Api {
       users,
       owner: group.groupName,
       callee: this.requestContext.owner,
-			messages: []
+      messages
     }
   }
-  async onNewPlayer(roomId: string, player: any) {
+  async sendNewPlayer(request: any) {
+    console.log('Api::sendNewPlayer', request)
+    const { roomId, player } = request
     this.sendMessage(`new${roomId}`, roomId, player)
   }
   async sendPosition(request: any) {
-    const { roomId, data } = request
-    this.sendMessage(`position${roomId}`, roomId, data)
+    console.log('Api::sendPosition', request)
+    const { roomId, player } = request
+    this.sendMessage(`position${roomId}`, roomId, player)
   }
   async sendChatMessage(request: any) {
-    const { roomId, message: { text, name } } = request
-    this.sendMessage(`chat${roomId}`, roomId, { name, text, ts: Date.now() })
+    console.log('Api::sendChatMessage', request)
+    const { roomId, message } = request
+    this.sendMessage(`chat${roomId}`, roomId, {
+      name: message.name,
+      text: message.text,
+      ts: Date.now()
+    })
     await this.stack.push({
       stack: roomId,
-      data: {
-        name,
-        text
-      }
+      data: message
     })
   }
 

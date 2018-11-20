@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ElementRef, Renderer2, Output, EventEmitter } from '@angular/core'
 import { ApiService, IMessage } from 'src/services/api/api.service'
-import { filter } from 'rxjs/operators';
+import { filter } from 'rxjs/operators'
 
 export interface IPlayer {
   id?: string
@@ -23,10 +23,14 @@ export class PlayerComponent implements OnInit {
     this.api.onGetPosition
       .pipe(filter((message: IMessage) => message.data.id == this.id))
       .subscribe((message: IMessage) => this.setPosition(message.data))
+
+    this.api.onNewPlayer.pipe(filter((message: IMessage) => message.data.id == this.id)).subscribe((message: IMessage) => {
+      this.element.nativeElement.classList.add('ready')
+      this.setPosition(message.data)
+    })
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   setPosition(player: IPlayer) {
     this.player = player

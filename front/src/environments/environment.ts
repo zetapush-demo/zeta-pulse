@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   platformUrl: 'http://hq.zpush.io:9080/zbo/pub/business',
-  appName: '7nrf6ikk7'
+  appName: '488gqhgex'
 }
 
 /*

@@ -30,5 +30,5 @@ export class IsConnectedGuard implements CanActivate {
 export const APP_ROUTES: Routes = [
   { path: '', redirectTo: 'join', pathMatch: 'full' },
   { path: 'join', component: JoinComponent, canActivate: [IsConnectedGuard] },
-  { path: 'game/:gameId', component: GameComponent, canActivate: [IsConnectedGuard] }
+  { path: 'game/:roomId', component: GameComponent, canActivate: [IsConnectedGuard] }
 ]

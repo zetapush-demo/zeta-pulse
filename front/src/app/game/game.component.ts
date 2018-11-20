@@ -16,7 +16,7 @@ import { DialogGameComponent } from '../../shared/components/dialog-game/dialog-
 export class GameComponent implements OnInit, OnDestroy {
   $move: Subscription // Observable for click event
 
-  gameId: string // Group Id
+  roomId: string // Group Id
   player: Partial<IPlayer> = {
     color: `hsl(${Math.round(360 * Math.random())}, 50%, 40%)` // random player color
   }
@@ -26,21 +26,21 @@ export class GameComponent implements OnInit, OnDestroy {
 
   users: string[] = [] // game's users list
   @ViewChild('game') game // html game container
+  @ViewChildren(PlayerComponent) players: QueryList<PlayerComponent>
 
   constructor(
     private api: ApiService, // api service connected to worker
     private route: ActivatedRoute, // angular route listener
     public dialog: MatDialog
-  ) {
-  }
+  ) {}
 
   ngOnInit() {
-    this.api.onNewPlayer.subscribe((message) => this.onNewPlayer(message))
-    this.route.params.subscribe(params => this.loadGame(params.gameId))
+    this.api.onNewPlayer.subscribe(message => this.onNewPlayer(message))
+    this.route.params.subscribe(params => this.loadGame(params.roomId))
   }
 
-  async loadGame(gameId) {
-    this.gameId = gameId
+  async loadGame(roomId) {
+    this.roomId = roomId
     await this.joinGame()
     this.askName()
   }
@@ -49,13 +49,14 @@ export class GameComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(name => {
       this.player.name = name
+      this.player.x = Math.round(Math.random() * window.innerWidth)
+      this.player.y = Math.round(Math.random() * window.innerHeight)
+      this.api.sendNewPlayer(this.roomId, this.player)
     })
   }
   async joinGame() {
     try {
-      this.player.x = Math.round(Math.random() * window.innerWidth)
-      this.player.y = Math.round(Math.random() * window.innerHeight)
-      const { response } = await this.api.joinRoom(this.gameId, this.player)
+      const { response } = await this.api.joinRoom(this.roomId)
       if (response) {
         this.onLoadGame(response)
       } else {
@@ -92,7 +93,7 @@ export class GameComponent implements OnInit, OnDestroy {
       x: event.clientX,
       y: event.clientY
     }
-    await this.api.setPosition(this.gameId, data)
+    await this.api.sendPosition(this.roomId, data)
   }
   onNewPlayer(message: IMessage) {
     this.users = message.target
