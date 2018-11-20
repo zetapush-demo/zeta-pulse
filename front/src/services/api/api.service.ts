@@ -5,7 +5,6 @@ import { WeakClient, ProxyService } from '@zetapush/client'
 import { Messaging } from '@zetapush/platform-legacy'
 import { environment } from 'src/environments/environment'
 import { IPlayer } from 'src/shared/components/player/player.component'
-import { IChatMessage } from '../../app/chat/chat.component'
 
 export interface IMessage {
   channel: string
@@ -22,7 +21,6 @@ export class ApiService {
   worker: ProxyService // Instance of api worker
   onGetPosition: Subject<IMessage> = new Subject() // Observable for 'player-position' event
   onNewPlayer: ReplaySubject<IMessage> = new ReplaySubject(1) // Observable for 'new-player' event
-  onChatMessage: Subject<IChatMessage> = new Subject() // Observable for 'new-chat-message' event
 
   /**
    * Init client and worker instance with env infos
@@ -73,13 +71,6 @@ export class ApiService {
           console.info('Api::message--position', response)
           const data: IMessage = response.data
           return this.onGetPosition.next(data)
-        },
-        // on 'new-chat-message' event
-        [`chat${roomId}`]: (response: any) => {
-          console.info('Api::message--chat', response)
-          const data: IMessage = response.data
-          const message: IChatMessage = data.data
-          this.onChatMessage.next(message)
         }
       }
     })
@@ -94,8 +85,5 @@ export class ApiService {
   }
   async sendNewPlayer(roomId: string, player: Partial<IPlayer>) {
     const response = await this.worker.sendNewPlayer({ roomId, player })
-  }
-  async sendChatMessage(roomId: string, message: IChatMessage) {
-    const response = await this.worker.sendChatMessage({ roomId, message })
   }
 }
