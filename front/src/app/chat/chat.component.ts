@@ -1,5 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core'
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core'
 import { ApiService } from '../../services/api/api.service'
+import { MatCardContent } from '@angular/material'
 
 export interface IChatMessage {
   name: string
@@ -16,6 +17,7 @@ export class ChatComponent implements OnInit {
   @Input() roomId: string
   @Input() name: string
   @Input() messages: IChatMessage[]
+  @ViewChild('content') content: ElementRef<any>
 
   constructor(
     private api: ApiService // api service connected to worker
@@ -30,11 +32,15 @@ export class ChatComponent implements OnInit {
    * send 'new-message' event with message data
    * @param text
    */
-  sendMessage(text) {
+  sendMessage(input: HTMLInputElement) {
+    if (input.value.length == 0) {
+      return
+    }
     const message = {
-      text,
+      text: input.value,
       name: this.name
     }
+    input.value = ''
     this.api.sendChatMessage(this.roomId, message)
   }
   /**
@@ -44,5 +50,10 @@ export class ChatComponent implements OnInit {
   onMessage(message: IChatMessage) {
     console.info('ChatComponent::onMessage', { message, messages: this.messages })
     this.messages.push(message)
+    // Async sticky scrolling
+    setTimeout(() => {
+      const content = this.content.nativeElement
+      content.scrollTo(0, content.scrollHeight)
+    })
   }
 }

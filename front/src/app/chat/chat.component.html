@@ -1,11 +1,11 @@
 <mat-card>
-  <mat-card-content>
+  <mat-card-content #content>
     <p *ngFor="let message of messages">{{message.name}} - {{message.text}} <span>{{message.ts | date:'HH:mm:ss' }}</span></p>
   </mat-card-content>
   <mat-card-footer>
-    <form novalidate (submit)="sendMessage(message.value)">
+    <form novalidate (submit)="sendMessage(input)">
       <mat-form-field>
-        <input matInput #message placeholder="Hello !">
+        <input matInput #input placeholder="Hello !" autocomplete="off">
       </mat-form-field>
       <button mat-raised-button type="submit">send</button>
     </form>
