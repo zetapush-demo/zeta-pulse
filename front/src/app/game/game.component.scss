@@ -11,5 +11,11 @@
   cursor: crosshair;
 }
 .infos {
+  position: absolute;
+  width: 100%;
   text-align: center;
+  z-index: 1;
+  button {
+    margin-left: 8px;
+  }
 }

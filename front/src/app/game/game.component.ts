@@ -133,6 +133,14 @@ export class GameComponent implements OnInit, OnDestroy {
     this.users = message.target
   }
 
+  async copyRoomId() {
+    try {
+      await navigator['clipboard'].writeText(this.roomId)
+    } catch (err) {
+      console.error('Failed to copy: ', err)
+    }
+  }
+
   // Destroy click handler
   ngOnDestroy() {
     this.$move.unsubscribe()
