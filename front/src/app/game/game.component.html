@@ -1,11 +1,12 @@
+
+<!-- Room infos -->
+<div class="infos">
+  <h2>Click to move !</h2>  
+  <h3>Room Id: {{roomId}} <button mat-raised-button (click)="copyRoomId()">copy</button>  </h3>
+  <h3>Players: {{users?.length}}</h3>
+</div>
+
 <div #game class="game">
-  <!-- Room infos -->
-  <div class="infos">
-    <h2>Click to move !</h2>  
-    <h3>Room Id: {{roomId}}</h3>
-    <h3>Players: {{users?.length}}</h3>
-  </div>
-  
   <!-- players component -->
   <app-player *ngFor="let id of users" [id]="id"></app-player>
 </div>
