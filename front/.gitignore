@@ -41,6 +41,7 @@ testem.log
 /.vagrant
 package-lock.json
 .prettierc
+deploy.sh
 
 # e2e
 /e2e/*.js
