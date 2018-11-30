@@ -1,29 +1,32 @@
 # Zetapulse - v1
 
-## Basic example of a zetapush project with group and messaging services
+## Basic angular example of a zetapush project with group and messaging services
+
+#### Installation
+
+`yarn install`
+
+---
 
 #### Start local worker
 
-`@zetapulse/back$ yarn serve`
+`yarn start-worker`
 
 ---
 
 #### Start local front
 
-`@zetapulse/front$ yarn start`
+`yarn start-front`
 
 ---
 
 ```
 
 zetapulse
-
 │ README.md
 │
-└─── back
-│ 		│ .zetarc
-│ └─── worker
-│ 			│ index.ts
+└─── worker
+│ └─── src
 │
 └─── front
 │ └─── src

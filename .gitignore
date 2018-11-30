@@ -1,3 +1,5 @@
 
 .vscode/*
 .prettierignore
+yarn.lock
+yarn-error.log
