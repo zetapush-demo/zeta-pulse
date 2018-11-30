@@ -1,12 +1,11 @@
 {
   "name": "zetapulse-worker",
   "version": "0.1.0",
-  "main": "worker/index.ts",
+  "main": "src/index.ts",
   "private": true,
   "scripts": {
     "deploy": "zeta push",
-    "serve": "zeta run --serve-front",
-    "start": "zeta run",
+    "start": "zeta run --grab-all-traffic",
     "troubleshoot": "zeta troubleshoot"
   },
   "dependencies": {

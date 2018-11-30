@@ -1,0 +1,10 @@
+{
+  "name": "zetapulse",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "install": "cd front && yarn && cd ../worker && yarn",
+    "start-front": "cd front && yarn start",
+    "start-worker": "cd worker && yarn start"
+  }
+}

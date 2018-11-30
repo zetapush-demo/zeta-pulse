@@ -1,31 +1,40 @@
-# Zetapulse - v2 - Chat
+# Zetapulse - v2
 
-## Basic example of a zetapush project with group, messaging and stack services
+## Basic angular example of a zetapush project with group, messaging and stack services
+
+#### Installation
+
+`yarn install`
+
+---
 
 #### Start local worker
 
-`@zetapulse/back$ yarn serve`
+`yarn start-worker`
 
 ---
 
 #### Start local front
 
-`@zetapulse/front$ yarn start`
+`yarn start-front`
 
 ---
+
+#### Project Structure
 
 ```
 
 zetapulse
-
 │ README.md
 │
-└─── back
-│ 		│ .zetarc
-│ └─── worker
-│ 			│ index.ts
+└─── worker
+│ └─── src
 │
 └─── front
 │ └─── src
 
 ```
+
+### What's next ?
+
+Coming soon - Zetapulse - v3 - adding authentication
