@@ -20,6 +20,8 @@
 
 ---
 
+#### Project Structure
+
 ```
 
 zetapulse
@@ -32,3 +34,7 @@ zetapulse
 │ └─── src
 
 ```
+
+### What's next ?
+
+[Zetapulse - v2 - adding a chat with stack service](https://github.com/zetapush-demo/zeta-pulse/tree/v2-chat)
